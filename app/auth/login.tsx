@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -13,7 +14,6 @@ import {
   TouchableWithoutFeedback,
   View
 } from 'react-native';
-// import * as SecureStore from 'expo-secure-store';
 import { LOGIN_API_URL } from '../../constants/api';
 
 const LoginScreen = () => {
@@ -42,19 +42,32 @@ const LoginScreen = () => {
 
       const data = await response.json();
 
+      console.log('Login response status:', response.status);
+      console.log('Login response data:', data);
+
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        let errorMessage = 'Login failed';
+        if (response.status === 400) {
+          errorMessage = data.message || 'Invalid request. Please check your input.';
+        } else if (response.status === 401) {
+          errorMessage = 'Invalid student ID or password.';
+        } else if (response.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        } else {
+          errorMessage = data.message || `Login failed with status ${response.status}`;
+        }
+        throw new Error(errorMessage);
       }
 
       // 2. Success Handling (Common for both modes)
       // Save the token securely so the user stays logged in
-      // if (data.token) {
-      //   await SecureStore.setItemAsync('userToken', data.token);
-      // }
+
+      if (data.token) {
+        await AsyncStorage.setItem('userToken', data.token);
+      }
 
       // Navigate to the events page
       router.replace('/event/events');
-
     } catch (error: any) {
       console.error('Login Error:', error);
       Alert.alert('Login Failed', error.message || 'Something went wrong');

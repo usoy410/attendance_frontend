@@ -20,7 +20,8 @@ import { EventCard } from "../../components/EventCard"; // Import the new compon
 import { Event, useEvents } from "../../hooks/useEvents";
 
 export default function EventsScreen() {
-  const { events, loading, refetch, addEvent, updateEvent, deleteEvent } = useEvents();
+  const { events, loading, refetch, addEvent, updateEvent, deleteEvent, page, limit, total, setPage } = useEvents();
+  const [saving, setSaving] = useState(false);
 
   // UI State
   const [modalVisible, setModalVisible] = useState(false);
@@ -62,13 +63,13 @@ export default function EventsScreen() {
   const handleEditPress = (event: Event) => {
     setIsEditing(true);
     setEditingEvent(event);
-    setNewTitle(event.title);
-    setNewDescription(event.description);
+    setNewTitle(event.eventTitle);
+    setNewDescription(event.eventDescription);
     setSelectedDate(new Date(event.date));
     setModalVisible(true);
   };
 
-  const handleDeletePress = (id: number) => {
+  const handleDeletePress = (id: string) => {
     Alert.alert("Delete Event", "Are you sure?", [
       { text: "Cancel", style: "cancel" },
       { text: "Delete", style: "destructive", onPress: () => deleteEvent(id) },
@@ -77,20 +78,24 @@ export default function EventsScreen() {
 
   const handleSave = async () => {
     if (!newTitle.trim()) return Alert.alert("Validation", "Please enter a title");
+    if (!newDescription.trim()) return Alert.alert("Validation", "Please enter a description");
+    if (!selectedDate) return Alert.alert("Validation", "Please select a date");
 
+    setSaving(true);
     const eventPayload = {
-      title: newTitle,
-      description: newDescription,
+      eventTitle: newTitle.trim(),
+      eventDescription: newDescription.trim(),
       date: selectedDate.toISOString().substring(0, 10),
     };
 
     let success = false;
     if (isEditing && editingEvent) {
-      success = await updateEvent(editingEvent.id, eventPayload);
+      success = await updateEvent(editingEvent._id, eventPayload);
     } else {
       success = await addEvent(eventPayload);
     }
 
+    setSaving(false);
     if (success) closeModal();
   };
 
@@ -111,7 +116,7 @@ export default function EventsScreen() {
         ) : (
           <FlatList
             data={events}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={item => item._id}
             contentContainerStyle={styles.listContainer}
             ListEmptyComponent={<Text style={styles.noEvents}>No events found</Text>}
             // for refresh of list
@@ -122,6 +127,27 @@ export default function EventsScreen() {
               <EventCard event={item} onEdit={handleEditPress} onDelete={handleDeletePress} />
             )}
           />
+        )}
+
+        {/* Pagination */}
+        {total > limit && (
+          <View style={styles.pagination}>
+            <TouchableOpacity
+              style={[styles.pageButton, page === 1 && styles.disabledButton]}
+              onPress={() => page > 1 && setPage(page - 1)}
+              disabled={page === 1}
+            >
+              <Text style={styles.pageButtonText}>Prev</Text>
+            </TouchableOpacity>
+            <Text style={styles.pageInfo}>Page {page} of {Math.ceil(total / limit)}</Text>
+            <TouchableOpacity
+              style={[styles.pageButton, page >= Math.ceil(total / limit) && styles.disabledButton]}
+              onPress={() => page < Math.ceil(total / limit) && setPage(page + 1)}
+              disabled={page >= Math.ceil(total / limit)}
+            >
+              <Text style={styles.pageButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
 
@@ -161,8 +187,8 @@ export default function EventsScreen() {
               <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
                 <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.buttonText}>{isEditing ? "Update" : "Add"}</Text>
+              <TouchableOpacity style={[styles.saveButton, saving && styles.disabledButton]} onPress={handleSave} disabled={saving}>
+                {saving ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>{isEditing ? "Update" : "Add"}</Text>}
               </TouchableOpacity>
             </View>
           </View>
@@ -238,4 +264,11 @@ const styles = StyleSheet.create({
   cancelButton: { backgroundColor: "#e0e0e0", paddingVertical: 12, borderRadius: 8, flex: 1 },
   saveButton: { backgroundColor: "#007bff", paddingVertical: 12, borderRadius: 8, flex: 1 },
   buttonText: { color: "white", textAlign: "center", fontWeight: "600", fontSize: 16 },
+
+  // Pagination Styles
+  pagination: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 16, backgroundColor: "#fff", borderTopWidth: 1, borderTopColor: "#ddd" },
+  pageButton: { backgroundColor: "#007bff", paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8 },
+  disabledButton: { backgroundColor: "#ccc" },
+  pageButtonText: { color: "white", fontWeight: "600" },
+  pageInfo: { fontSize: 16, color: "#333" },
 });

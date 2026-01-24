@@ -6,7 +6,7 @@ import { Event } from '../hooks/useEvents';
 interface EventCardProps {
   event: Event;
   onEdit: (event: Event) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
@@ -17,9 +17,9 @@ export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
       pathname: '/event/[id]',
 
       params: {
-        id: event.id,
-        title: event.title,
-        description: event.description,
+        id: event._id,
+        title: event.eventTitle,
+        description: event.eventDescription,
         date: event.date
       }
     });
@@ -27,9 +27,9 @@ export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
 
   return (
     <TouchableOpacity style={styles.card} onPress={handleCardPress} activeOpacity={0.7}>
-      <Text style={styles.cardTitle}>{event.title}</Text>
+      <Text style={styles.cardTitle}>{event.eventTitle}</Text>
       <Text style={styles.cardDesc} numberOfLines={2}>
-        {event.description}
+        {event.eventDescription}
       </Text>
 
       <View style={styles.footer}>
@@ -45,7 +45,7 @@ export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
 
           <TouchableOpacity
             style={styles.iconButton}
-            onPress={() => onDelete(event.id)}
+            onPress={() => onDelete(event._id)}
           >
             <Ionicons name="trash" size={20} color="#dc3545" />
           </TouchableOpacity>
