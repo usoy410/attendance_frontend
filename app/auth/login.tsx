@@ -15,7 +15,8 @@ import {
   View
 } from 'react-native';
 import { BASE_API_URL } from '../../constants/api';
-const API_URL = `${BASE_API_URL}/login`;
+
+const API_URL = `${BASE_API_URL}/auth/login`;
 const LoginScreen = () => {
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
@@ -42,8 +43,8 @@ const LoginScreen = () => {
 
       const data = await response.json();
 
-      console.log('Login response status:', response.status);
-      console.log('Login response data:', data);
+      // console.log('Login response status:', response.status);
+      // console.log('Login response data:', data);
 
       if (!response.ok) {
         let errorMessage = 'Login failed';

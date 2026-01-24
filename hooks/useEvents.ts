@@ -45,14 +45,21 @@ export const useEvents = () => {
 
   // Fetch Events
   const fetchEvents = useCallback(async (currentPage: number = page, currentLimit: number = limit) => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const url = `${API_URL}?page=${currentPage}&limit=${currentLimit}`;
+      // console.log('Fetching events from:', url, 'with token:', !!token);
       const response = await fetch(url, {
         headers: getAuthHeaders(token),
       });
       const data = await response.json();
+      // console.log('Events response status:', response.status);
+      // console.log('Events response data:', data);
       if (response.ok) {
         if (data.success && Array.isArray(data.events)) {
           setEvents(data.events);
