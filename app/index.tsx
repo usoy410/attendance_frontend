@@ -1,62 +1,26 @@
-import { router } from 'expo-router'
-import { useState } from 'react'
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
+import { router } from "expo-router";
+import { useEffect } from "react";
+import { Image, StyleSheet, View } from "react-native";
 
-const Index = () => {
-  const [studentId, setStudentId] = useState('')
-  const [password, setPassword] = useState('')
+const SplashScreen = () => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.replace("/auth/login");
+    }, 2000); // Navigate to login after 2 seconds
 
-  const handleLogin = () => {
-    router.navigate("/(tabs)/events")
-    console.log('Login pressed', studentId, password)
-  }
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.label}>Student ID</Text>
-      <TextInput
-        style={styles.input}
-        value={studentId}
-        onChangeText={setStudentId}
-        placeholder="Enter Student ID"
-      />
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholder="Enter Password"
-      />
-      <Button title="Login" onPress={handleLogin} />
+      <Image source={require("../assets/images/cyberdevlogo.png")} style={styles.logo} />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    marginBottom: 15,
-    borderRadius: 5,
-  },
-})
+  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#007bff" },
+  logo: { width: 200, height: 200, resizeMode: "contain" },
+});
 
-export default Index
+export default SplashScreen;
