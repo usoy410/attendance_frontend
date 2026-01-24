@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { ATTENDANCE_API_URL } from '../constants/api';
+import { BASE_API_URL } from '../constants/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export interface Attendance {
   _id: string;
-  student: string; 
+  student: string;
   event: string;
   AM?: boolean;
   PM?: boolean;
@@ -12,7 +12,7 @@ export interface Attendance {
   updatedAt?: string;
 }
 
-const API_URL = ATTENDANCE_API_URL;
+const API_URL = `${BASE_API_URL}/attendance`;
 
 const getAuthHeaders = (token: string | null): Record<string, string> => {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };

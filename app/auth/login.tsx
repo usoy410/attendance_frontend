@@ -14,8 +14,8 @@ import {
   TouchableWithoutFeedback,
   View
 } from 'react-native';
-import { LOGIN_API_URL } from '../../constants/api';
-
+import { BASE_API_URL } from '../../constants/api';
+const API_URL = `${BASE_API_URL}/login`;
 const LoginScreen = () => {
   const [studentId, setStudentId] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +31,7 @@ const LoginScreen = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(LOGIN_API_URL, {
+      const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

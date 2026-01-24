@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
-import { STUDENT_API_URL } from '../constants/api';
+import { BASE_API_URL } from '../constants/api';
 
 export interface Student {
   _id: string;
@@ -13,7 +13,7 @@ export interface Student {
   updatedAt?: string;
 }
 
-const API_URL = STUDENT_API_URL;
+const API_URL = `${BASE_API_URL}/student`;
 
 const getAuthHeaders = (token: string | null): Record<string, string> => {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { EVENTS_API_URL } from '../constants/api';
+import { BASE_API_URL } from '../constants/api';
 export interface Event {
   _id: string;
   eventTitle: string;
@@ -11,7 +11,7 @@ export interface Event {
   updatedAt?: string;
 }
 
-const API_URL = EVENTS_API_URL;
+const API_URL = `${BASE_API_URL}/event`;
 
 const getAuthHeaders = (token: string | null): Record<string, string> => {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
