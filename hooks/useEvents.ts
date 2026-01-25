@@ -95,15 +95,11 @@ export const useEvents = () => {
   }, [fetchEvents]);
 
   // Polling for real-time updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!loading) {
-        fetchEvents(page, limit);
-      }
-    }, 30000); // Poll every 30 seconds
-
-    return () => clearInterval(interval);
-  }, [fetchEvents, loading, page, limit]);
+  // useEffect(() => {
+  //     if (!loading) {
+  //       fetchEvents(page, limit);
+  //     }
+  // }, [fetchEvents, loading, page, limit]);
 
   // Add Event
   const addEvent = async (event: Omit<Event, '_id' | 'createdAt' | 'updatedAt'>) => {

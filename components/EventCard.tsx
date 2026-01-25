@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { typography, elevation, colors, spacing, borderRadius } from '../constants/theme';
 import { Event } from '../hooks/useEvents';
 
 interface EventCardProps {
@@ -57,47 +58,45 @@ export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    padding: 20,
-    marginVertical: 8,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: colors.bgPrimary,
+    padding: spacing.xl,
+    marginVertical: spacing.sm,
+    borderRadius: borderRadius.md,
+    ...elevation.level2,
   },
   cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#222',
-    marginBottom: 6,
+    ...typography.h3,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs + 2,
   },
   cardDesc: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 10,
-    lineHeight: 20,
+    ...typography.body,
+    color: colors.textTertiary,
+    marginBottom: spacing.md - 2,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-    paddingTop: 12,
+    borderTopColor: colors.borderLight,
+    paddingTop: spacing.md,
   },
   cardDate: {
-    fontSize: 13,
-    color: '#888',
+    ...typography.bodySm,
+    color: colors.textMuted,
     fontStyle: 'italic',
   },
   buttonContainer: {
     flexDirection: 'row',
   },
   iconButton: {
-    marginLeft: 16,
-    padding: 4,
+    marginLeft: spacing.sm,
+    padding: spacing.md,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

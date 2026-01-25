@@ -1,9 +1,11 @@
 import BackButton from "@/components/backButton";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
+// import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Alert, Button, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { borderRadius, colors, elevation, spacing, touchTarget, typography } from "../../constants/theme";
 
 export default function EventDetails() {
   const params = useLocalSearchParams();
@@ -28,23 +30,19 @@ export default function EventDetails() {
   }
 
   // Handle Scan Logic
-  const handleBarcodeScanned = ({ data }: { data: string }) => {
+  const handleBarcodeScanned = async ({ data }: { data: string }) => {
     if (scanned) return;
 
     setScanned(true);
     // maybe add some vibrator ahhhhhhh
-
-    Alert.alert("Check-in Successful", `Session: ${timeOfDay}\ Event Data: ${data}`, [
-      { text: "Scan Next", onPress: () => setScanned(false) },
-    ]);
   };
 
   return (
+    // <LinearGradient  {...gradients.blueRedHorizontal} style={styles.gradientContainer}>
     <View style={styles.container}>
       <View style={styles.top_items}>
         <BackButton size={30} />
         <Text style={styles.pageTitle}>QRCode Scanning</Text>
-        {/* <Text style={styles.dateBadgeText}>{params.date}</Text> */}
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Stack.Screen options={{ title: "Scan Attendance", headerBackTitle: "Back" }} />
@@ -53,7 +51,22 @@ export default function EventDetails() {
         <View style={styles.header}>
 
           <Text style={styles.title}>{params.title}</Text>
-          <Text style={styles.description}>{params.description}</Text>
+          <View style={styles.spanContent
+          }>
+            <Text style={styles.whatInfo}>
+              Description:
+            </Text>
+            <Text style={styles.description}>{params.description}</Text>
+          </View>
+          <View style={styles.spanContent
+          }>
+            <Text style={styles.whatInfo}>
+              Date:
+            </Text>
+            <Text style={styles.dateBadgeText}>
+              {params.date}</Text>
+
+          </View>
         </View>
 
         <View style={styles.divider} />
@@ -111,118 +124,136 @@ export default function EventDetails() {
         </View>
       </ScrollView>
     </View>
+    // </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientContainer: {
+    flex: 1,
+  },
   container: {
-    flexGrow: 1,
-    backgroundColor: "#f8f9fa",
-    padding: 24,
+    flex: 1,
+    padding: spacing.xxl,
   },
   permissionContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: spacing.xl,
   },
   permissionText: {
-    fontSize: 16,
-    marginBottom: 20,
+    ...typography.bodyLg,
+    marginBottom: spacing.xl,
     textAlign: "center",
+    color: colors.textSecondary,
   },
-  header: { marginBottom: 10 },
+  header: { marginBottom: spacing.md - 2 },
+  spanContent: {
+    flexDirection: 'row',
+  },
+  whatInfo: {
+    marginRight: spacing.md,
+    ...typography.bodyLg,
+  },
   top_items: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: 'center',
-    marginBottom: 15
+    marginBottom: spacing.lg - 1,
   },
   dateBadgeText: {
-    color: "#1a1a1a",
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center"
+    color: colors.textTertiary,
+    ...typography.bodyLg,
   },
-    pageTitle: {
-    color: "#1a1a1a",
-    fontSize: 18,
-    fontWeight: "600",
-    textAlign: "center"
+  pageTitle: {
+    color: colors.textPrimary,
+    ...typography.h3,
+    textAlign: "center",
   },
   title: {
-    fontSize: 26,
+    ...typography.h2,
     fontWeight: "800",
-    color: "#1a1a1a",
-    marginBottom: 8,
-    // textAlign: 'center'
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
   },
   description: {
-    fontSize: 16,
-    color: "#666",
-    lineHeight: 24
+    ...typography.bodyLg,
+    color: colors.textTertiary,
   },
   divider: {
     height: 1,
-    backgroundColor: "#eee",
-    marginVertical: 24
+    backgroundColor: colors.borderLight,
+    marginVertical: spacing.xxl,
   },
-  section: { marginBottom: 10 },
+  section: { marginBottom: spacing.md - 2 },
   sectionTitle: {
-    fontSize: 18,
+    ...typography.h3,
     fontWeight: "700",
-    marginBottom: 16,
-    color: "#333"
+    marginBottom: spacing.lg,
+    color: colors.textPrimary,
   },
 
   // Radio Buttons
-  radioGroup: { flexDirection: "row", gap: 16 },
+  radioGroup: { flexDirection: "row", gap: spacing.lg },
   radioButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    backgroundColor: colors.bgPrimary,
+    paddingVertical: spacing.lg - 2,
+    paddingHorizontal: spacing.lg,
+    borderRadius: borderRadius.md,
     borderWidth: 2,
-    borderColor: "#eee",
+    borderColor: colors.borderLight,
     flex: 1,
+    minHeight: touchTarget.comfortable,
     justifyContent: "center",
+    ...elevation.level1,
   },
-  radioButtonSelected: { borderColor: "#007bff", backgroundColor: "#f8fbff" },
+  radioButtonSelected: {
+    borderColor: colors.primary,
+    backgroundColor: "#f8fbff",
+    ...elevation.level2,
+  },
   radioOuterCircle: {
     height: 20,
     width: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#bbb",
+    borderColor: colors.borderDark,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 10,
+    marginRight: spacing.md - 2,
   },
-  radioInnerCircle: { height: 10, width: 10, borderRadius: 5, backgroundColor: "#007bff" },
-  radioText: { fontSize: 16, fontWeight: "600", color: "#777" },
-  radioTextSelected: { color: "#007bff" },
+  radioInnerCircle: {
+    height: 10,
+    width: 10,
+    borderRadius: 5,
+    backgroundColor: colors.primary
+  },
+  radioText: {
+    ...typography.bodyLg,
+    fontWeight: "600",
+    color: colors.textMuted
+  },
+  radioTextSelected: { color: colors.primary },
 
   // Scanner UI
   qrCodeSection: {
     alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
+    backgroundColor: colors.bgPrimary,
+    padding: spacing.md - 2,
+    borderRadius: borderRadius.xl,
+    ...elevation.level3,
+    marginBottom: spacing.xxxl * 3
   },
   scannerContainer: {
     width: 300,
     height: 300,
     backgroundColor: "#000",
-    borderRadius: 16,
+    borderRadius: borderRadius.lg,
     overflow: "hidden",
-    marginBottom: 16,
+    marginBottom: spacing.lg,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -238,10 +269,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   successText: {
-    fontSize: 20,
+    ...typography.h3,
     fontWeight: "bold",
-    color: "#2e7d32",
-    marginVertical: 15,
+    color: colors.success,
+    marginVertical: spacing.lg - 1,
   },
-  qrHint: { color: "#888", fontSize: 14, marginBottom: 16 },
+  qrHint: {
+    color: colors.textMuted,
+    ...typography.body,
+    marginBottom: spacing.lg
+  },
 });
