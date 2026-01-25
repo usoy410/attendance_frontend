@@ -1,8 +1,8 @@
+import { gradients } from "@/constants/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { Image, StyleSheet } from "react-native";
-import { gradients } from "@/constants/theme";
 
 const SplashScreen = () => {
   useEffect(() => {
@@ -15,7 +15,7 @@ const SplashScreen = () => {
 
   return (
     <LinearGradient {...gradients.blueRedHorizontal} style={styles.container}>
-      <Image source={require("../assets/images/cyberdevlogo.png")} style={styles.logo} />
+      <Image source={require("../assets/images/icon.png")} style={styles.logo} />
     </LinearGradient>
   );
 };
