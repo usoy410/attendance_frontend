@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-// import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -18,7 +17,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EventCard } from "../../components/EventCard";
-import { borderRadius, colors, elevation, gradients, spacing, touchTarget, typography } from "../../constants/theme";
+import { borderRadius, colors, elevation, spacing, touchTarget, typography } from "../../constants/theme";
 import { Event, useEvents } from "../../hooks/useEvents";
 
 export default function EventsScreen() {
@@ -27,7 +26,7 @@ export default function EventsScreen() {
 
   // UI State
   const [modalVisible, setModalVisible] = useState(false);
-  const [refreshing, setRefreshing] = useState(false); // Local refreshing state
+  const [refreshing, setRefreshing] = useState(false);
 
   // Form State
   const [newTitle, setNewTitle] = useState("");
@@ -108,99 +107,99 @@ export default function EventsScreen() {
 
   return (
     // <LinearGradient  {...gradients.blueRedHorizontal} style={styles.gradientContainer}>
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.container}>
-          <Text style={styles.title}>Events</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Events</Text>
 
-          {loading && !refreshing ? (
-            <View style={styles.center}>
-              <ActivityIndicator size="large" color="#007bff" />
-            </View>
-          ) : (
-            <FlatList
-              data={events}
-              keyExtractor={item => item._id}
-              contentContainerStyle={styles.listContainer}
-              ListEmptyComponent={<Text style={styles.noEvents}>No events found</Text>}
-              // for refresh of list
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#007bff"]} />
-              }
-              renderItem={({ item }) => (
-                <EventCard event={item} onEdit={handleEditPress} onDelete={handleDeletePress} />
-              )}
+        {loading && !refreshing ? (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color="#007bff" />
+          </View>
+        ) : (
+          <FlatList
+            data={events}
+            keyExtractor={item => item._id}
+            contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={<Text style={styles.noEvents}>No events found</Text>}
+            // for refresh of list
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#007bff"]} />
+            }
+            renderItem={({ item }) => (
+              <EventCard event={item} onEdit={handleEditPress} onDelete={handleDeletePress} />
+            )}
+          />
+        )}
+
+        {/* Pagination */}
+        {total > limit && (
+          <View style={styles.pagination}>
+            <TouchableOpacity
+              style={[styles.pageButton, page === 1 && styles.disabledButton]}
+              onPress={() => page > 1 && setPage(page - 1)}
+              disabled={page === 1}
+            >
+              <Text style={styles.pageButtonText}>Prev</Text>
+            </TouchableOpacity>
+            <Text style={styles.pageInfo}>Page {page} of {Math.ceil(total / limit)}</Text>
+            <TouchableOpacity
+              style={[styles.pageButton, page >= Math.ceil(total / limit) && styles.disabledButton]}
+              onPress={() => page < Math.ceil(total / limit) && setPage(page + 1)}
+              disabled={page >= Math.ceil(total / limit)}
+            >
+              <Text style={styles.pageButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+
+      <TouchableOpacity style={styles.addButton} onPress={openAddModal}>
+        <Ionicons name="add" size={30} color="white" />
+      </TouchableOpacity>
+
+      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={closeModal}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.modalOverlay}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{isEditing ? "Edit Event" : "Add New Event"}</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Event Title"
+              value={newTitle}
+              onChangeText={setNewTitle}
             />
-          )}
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Description"
+              value={newDescription}
+              onChangeText={setNewDescription}
+              multiline
+              numberOfLines={3}
+            />
 
-          {/* Pagination */}
-          {total > limit && (
-            <View style={styles.pagination}>
-              <TouchableOpacity
-                style={[styles.pageButton, page === 1 && styles.disabledButton]}
-                onPress={() => page > 1 && setPage(page - 1)}
-                disabled={page === 1}
-              >
-                <Text style={styles.pageButtonText}>Prev</Text>
+            <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
+              <Ionicons name="calendar-outline" size={20} color="#333" />
+              <Text style={styles.dateText}>{selectedDate.toDateString()}</Text>
+            </TouchableOpacity>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
+                <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
-              <Text style={styles.pageInfo}>Page {page} of {Math.ceil(total / limit)}</Text>
-              <TouchableOpacity
-                style={[styles.pageButton, page >= Math.ceil(total / limit) && styles.disabledButton]}
-                onPress={() => page < Math.ceil(total / limit) && setPage(page + 1)}
-                disabled={page >= Math.ceil(total / limit)}
-              >
-                <Text style={styles.pageButtonText}>Next</Text>
+              <TouchableOpacity style={[styles.saveButton, saving && styles.disabledButton]} onPress={handleSave} disabled={saving}>
+                {saving ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>{isEditing ? "Update" : "Add"}</Text>}
               </TouchableOpacity>
             </View>
-          )}
-        </View>
-
-        <TouchableOpacity style={styles.addButton} onPress={openAddModal}>
-          <Ionicons name="add" size={30} color="white" />
-        </TouchableOpacity>
-
-        <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={closeModal}>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={styles.modalOverlay}
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{isEditing ? "Edit Event" : "Add New Event"}</Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Event Title"
-                value={newTitle}
-                onChangeText={setNewTitle}
-              />
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Description"
-                value={newDescription}
-                onChangeText={setNewDescription}
-                multiline
-                numberOfLines={3}
-              />
-
-              <TouchableOpacity style={styles.dateInput} onPress={() => setShowDatePicker(true)}>
-                <Ionicons name="calendar-outline" size={20} color="#333" />
-                <Text style={styles.dateText}>{selectedDate.toDateString()}</Text>
-              </TouchableOpacity>
-
-              <View style={styles.modalButtons}>
-                <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
-                  <Text style={styles.buttonText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.saveButton, saving && styles.disabledButton]} onPress={handleSave} disabled={saving}>
-                  {saving ? <ActivityIndicator color="white" /> : <Text style={styles.buttonText}>{isEditing ? "Update" : "Add"}</Text>}
-                </TouchableOpacity>
-              </View>
-            </View>
-          </KeyboardAvoidingView>
-          {showDatePicker && (
-            <DateTimePicker value={selectedDate} mode="date" display="default" onChange={onDateChange} />
-          )}
-        </Modal>
-      </SafeAreaView>
+          </View>
+        </KeyboardAvoidingView>
+        {showDatePicker && (
+          <DateTimePicker value={selectedDate} mode="date" display="default" onChange={onDateChange} />
+        )}
+      </Modal>
+    </SafeAreaView>
     // </LinearGradient>
   );
 }

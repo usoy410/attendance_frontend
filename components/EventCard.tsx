@@ -1,22 +1,21 @@
+import { borderRadius, colors, elevation, spacing, typography } from '@/constants/theme';
+import { Event } from '@/hooks/useEvents';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { typography, elevation, colors, spacing, borderRadius } from '../constants/theme';
-import { Event } from '../hooks/useEvents';
 
 interface EventCardProps {
   event: Event;
   onEdit: (event: Event) => void;
   onDelete: (id: string) => void;
 }
-
-export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
+const EventCardBase = ({ event, onEdit, onDelete }: EventCardProps) => {
   const router = useRouter();
 
-  const handleCardPress = () => {
+  const handleCardPress = useCallback(() => {
     router.push({
       pathname: '/event/[id]',
-
       params: {
         id: event._id,
         title: event.eventTitle,
@@ -24,7 +23,7 @@ export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
         date: event.date
       }
     });
-  };
+  }, [router, event._id, event.eventTitle, event.eventDescription, event.date]);
 
   return (
     <TouchableOpacity style={styles.card} onPress={handleCardPress} activeOpacity={0.7}>
@@ -55,6 +54,9 @@ export const EventCard = ({ event, onEdit, onDelete }: EventCardProps) => {
     </TouchableOpacity>
   );
 };
+
+// Export the memoized version
+export const EventCard = React.memo(EventCardBase);
 
 const styles = StyleSheet.create({
   card: {

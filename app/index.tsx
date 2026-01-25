@@ -1,8 +1,8 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { Image, StyleSheet, View } from "react-native";
-import { gradients } from "../constants/theme";
+import { Image, StyleSheet } from "react-native";
+import { gradients } from "@/constants/theme";
 
 const SplashScreen = () => {
   useEffect(() => {

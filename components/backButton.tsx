@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import { colors, elevation, spacing, borderRadius, touchTarget } from '../constants/theme';
+import { spacing, touchTarget } from '@/constants/theme';
 
 interface BackButtonProps {
   color?: string;

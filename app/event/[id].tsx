@@ -1,10 +1,11 @@
 import BackButton from "@/components/backButton";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
-// import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Button,
   Modal,
   ScrollView,
@@ -12,8 +13,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
-  Alert,
 } from "react-native";
 import {
   borderRadius,
@@ -37,10 +36,8 @@ export default function EventDetails() {
   const params = useLocalSearchParams();
   const eventId = params.id as string;
 
-  // Permission Hook
+  // 1. HOOKS (Must be declared before any return statements)
   const [permission, requestPermission] = useCameraPermissions();
-
-  // Attendance Hook
   const { submitAttendance, isLoading } = useAttendance();
 
   const [timeOfDay, setTimeOfDay] = useState<"AM" | "PM">("AM");
@@ -48,29 +45,43 @@ export default function EventDetails() {
   const [modalVisible, setModalVisible] = useState(false);
   const [studentData, setStudentData] = useState<StudentData | null>(null);
 
-  // Handle Permissions
-  if (!permission) {
-    return <View />;
-  }
-  if (!permission.granted) {
+  // 2. MEMOS & CALLBACKS (Moved up)
+  const dataContent = useMemo(() => {
+    if (!studentData) {
+      return <Text style={styles.noDataText}>No valid student data</Text>;
+    }
     return (
-      <View style={styles.permissionContainer}>
-        <Text style={styles.permissionText}>
-          We need camera access to scan QR.
-        </Text>
-        <Button onPress={requestPermission} title="Grant Permission" />
-      </View>
+      <>
+        <View style={styles.dataItem}>
+          <Text style={styles.dataKey}>First Name:</Text>
+          <Text style={styles.dataValue}>{studentData.firstName}</Text>
+        </View>
+        <View style={styles.dataItem}>
+          <Text style={styles.dataKey}>Last Name:</Text>
+          <Text style={styles.dataValue}>{studentData.lastName}</Text>
+        </View>
+        <View style={styles.dataItem}>
+          <Text style={styles.dataKey}>Student ID:</Text>
+          <Text style={styles.dataValue}>{studentData.studentId}</Text>
+        </View>
+        <View style={styles.dataItem}>
+          <Text style={styles.dataKey}>Course/Year/Section:</Text>
+          <Text style={styles.dataValue}>{studentData.CSY}</Text>
+        </View>
+        <View style={styles.dataItem}>
+          <Text style={styles.dataKey}>GBox Email:</Text>
+          <Text style={styles.dataValue}>{studentData.gbox}</Text>
+        </View>
+      </>
     );
-  }
+  }, [studentData]);
 
-  // Handle Scan Logic
-  const handleBarcodeScanned = async ({ data }: { data: string }) => {
+  const handleBarcodeScanned = useCallback(async ({ data }: { data: string }) => {
     if (scanned) return;
 
     try {
       const parsedData = JSON.parse(data);
 
-      // Extract only required fields and map to expected field names
       const extracted: StudentData = {
         firstName: parsedData.firstName || parsedData.first_name || "",
         lastName: parsedData.lastName || parsedData.last_name || "",
@@ -82,22 +93,19 @@ export default function EventDetails() {
       setScanned(true);
       setModalVisible(true);
     } catch (error) {
-      // If data is not valid JSON, show error
       console.error("Failed to parse QR code:", error);
       Alert.alert("Error", "Invalid QR code format. Please try again.");
       setStudentData(null);
       setScanned(false);
     }
-  };
+  }, [scanned]);
 
-  // Handle Approval
-  const handleApprove = async () => {
+  const handleApprove = useCallback(async () => {
     if (!studentData) {
       Alert.alert("Error", "No student data available");
       return;
     }
 
-    // Build payload conditionally based on selected session
     const payload: any = {
       firstName: studentData.firstName,
       lastName: studentData.lastName,
@@ -106,15 +114,11 @@ export default function EventDetails() {
       gbox: studentData.gbox,
     };
 
-    // Only add the selected session to the payload
     if (timeOfDay === "AM") {
       payload.AM = true;
     } else if (timeOfDay === "PM") {
       payload.PM = true;
     }
-
-    console.log("Event ID:", eventId);
-    console.log("Submitting attendance with payload:", payload);
 
     const success = await submitAttendance(eventId, payload);
 
@@ -124,17 +128,32 @@ export default function EventDetails() {
       setStudentData(null);
       Alert.alert("Success", "Attendance recorded successfully");
     }
-  };
+  }, [studentData, timeOfDay, eventId, submitAttendance]);
 
-  // Handle Rejection
-  const handleReject = () => {
+  const handleReject = useCallback(() => {
     setModalVisible(false);
     setScanned(false);
     setStudentData(null);
-  };
+  }, []);
 
+  // 3. CONDITIONAL RENDERS (Safe to do now that hooks are registered)
+  if (!permission) {
+    return <View />;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.permissionContainer}>
+        <Text style={styles.permissionText}>
+          We need camera access to scan QR.
+        </Text>
+        <Button onPress={requestPermission} title="Grant Permission" />
+      </View>
+    );
+  }
+
+  // 4. MAIN RENDER
   return (
-    // <LinearGradient  {...gradients.blueRedHorizontal} style={styles.gradientContainer}>
     <View style={styles.container}>
       <Modal
         animationType="fade"
@@ -157,36 +176,7 @@ export default function EventDetails() {
               style={styles.dataContainer}
               showsVerticalScrollIndicator={false}
             >
-              {studentData ? (
-                <>
-                  <View style={styles.dataItem}>
-                    <Text style={styles.dataKey}>First Name:</Text>
-                    <Text style={styles.dataValue}>
-                      {studentData.firstName}
-                    </Text>
-                  </View>
-                  <View style={styles.dataItem}>
-                    <Text style={styles.dataKey}>Last Name:</Text>
-                    <Text style={styles.dataValue}>{studentData.lastName}</Text>
-                  </View>
-                  <View style={styles.dataItem}>
-                    <Text style={styles.dataKey}>Student ID:</Text>
-                    <Text style={styles.dataValue}>
-                      {studentData.studentId}
-                    </Text>
-                  </View>
-                  <View style={styles.dataItem}>
-                    <Text style={styles.dataKey}>Course/Year/Section:</Text>
-                    <Text style={styles.dataValue}>{studentData.CSY}</Text>
-                  </View>
-                  <View style={styles.dataItem}>
-                    <Text style={styles.dataKey}>GBox Email:</Text>
-                    <Text style={styles.dataValue}>{studentData.gbox}</Text>
-                  </View>
-                </>
-              ) : (
-                <Text style={styles.noDataText}>No valid student data</Text>
-              )}
+              {dataContent}
             </ScrollView>
 
             <View style={styles.buttonContainer}>
@@ -225,12 +215,12 @@ export default function EventDetails() {
         <BackButton size={30} />
         <Text style={styles.pageTitle}>QRCode Scanning</Text>
       </View>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <Stack.Screen
           options={{ title: "Scan Attendance", headerBackTitle: "Back" }}
         />
 
-        {/* Header Info */}
         <View style={styles.header}>
           <Text style={styles.title}>{params.title}</Text>
           <View style={styles.spanContent}>
@@ -245,7 +235,6 @@ export default function EventDetails() {
 
         <View style={styles.divider} />
 
-        {/* Session Selector */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Select Session</Text>
           <View style={styles.radioGroup}>
@@ -278,11 +267,9 @@ export default function EventDetails() {
 
         <View style={styles.divider} />
 
-        {/* --- SCANNER SECTION --- */}
         <View style={styles.qrCodeSection}>
           <Text style={styles.sectionTitle}>Scan QRCode</Text>
 
-          {/* Scanner Box*/}
           <View style={styles.scannerContainer}>
             {!scanned ? (
               <CameraView
@@ -312,7 +299,6 @@ export default function EventDetails() {
         </View>
       </ScrollView>
     </View>
-    // </LinearGradient>
   );
 }
 
@@ -381,8 +367,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     color: colors.textPrimary,
   },
-
-  // Radio Buttons
   radioGroup: { flexDirection: "row", gap: spacing.lg },
   radioButton: {
     flexDirection: "row",
@@ -425,8 +409,6 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   radioTextSelected: { color: colors.primary },
-
-  // Scanner UI
   qrCodeSection: {
     alignItems: "center",
     backgroundColor: colors.bgPrimary,
@@ -467,8 +449,6 @@ const styles = StyleSheet.create({
     ...typography.body,
     marginBottom: spacing.lg,
   },
-
-  // Modal Styles
   centeredView: {
     flex: 1,
     justifyContent: "center",
