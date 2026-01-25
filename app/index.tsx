@@ -15,7 +15,7 @@ const SplashScreen = () => {
 
   return (
     <LinearGradient {...gradients.blueRedHorizontal} style={styles.container}>
-      <Image source={require("../assets/images/icon.png")} style={styles.logo} />
+      <Image source={require("../assets/images/splash.png")} style={styles.logo} />
     </LinearGradient>
   );
 };

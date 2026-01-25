@@ -1,7 +1,7 @@
 {
     "expo": {
-        "name": "RN_CyberDev",
-        "slug": "RN_CyberDev",
+        "name": "CCS Attendance",
+        "slug": "CCS Attendance",
         "version": "1.0.0",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
