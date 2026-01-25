@@ -1,4 +1,6 @@
-const BASE_CDN = "https://res.cloudinary.com/dgebrdeka/image/upload";
+import { BASE_CDN_URL } from "./api";
+
+const BASE_CDN = BASE_CDN_URL;
 const TRANSFORMS = "c_auto,h_100,w_100";
 
 export const LOGO_SOURCES = {
