@@ -33,6 +33,8 @@ yarn-error.*
 .env
 .env*.local
 
+# expo eas files
+eas.json
 # typescript
 *.tsbuildinfo
 
