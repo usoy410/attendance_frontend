@@ -1,7 +1,7 @@
+import { BASE_API_URL } from "@/constants/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { BASE_API_URL } from "../constants/api";
 
 export interface AttendancePayload {
   firstName: string;
@@ -11,6 +11,7 @@ export interface AttendancePayload {
   gbox: string;
   AM?: boolean;
   PM?: boolean;
+  
 }
 
 const API_URL = `${BASE_API_URL}/attendance`;

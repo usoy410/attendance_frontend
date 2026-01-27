@@ -23,11 +23,13 @@ import {
 export default function EventDetails() {
   const params = useLocalSearchParams();
   const eventId = params.id as string;
-
   const [permission, requestPermission] = useCameraPermissions();
   const { submitAttendance, isLoading } = useAttendance();
 
+  // seesion selector state
   const [timeOfDay, setTimeOfDay] = useState<"AM" | "PM">("AM");
+  const [timeType, setTimeType] = useState<"Time In" | "Time Out">("Time In");
+
   const [scanned, setScanned] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [studentData, setStudentData] = useState<StudentData | null>(null);
@@ -109,7 +111,7 @@ export default function EventDetails() {
         onReject={handleReject}
         onClose={() => setModalVisible(false)}
       />
-
+      {/* page title */}
       <View style={styles.top_items}>
         <BackButton size={30} />
         <Text style={styles.pageTitle}>QRCode Scanning</Text>
@@ -120,6 +122,7 @@ export default function EventDetails() {
           options={{ title: "Scan Attendance", headerBackTitle: "Back" }}
         />
 
+        {/* Event Details */}
         <View style={styles.header}>
           <Text style={styles.title}>{params.title}</Text>
           <View style={styles.spanContent}>
@@ -134,7 +137,14 @@ export default function EventDetails() {
 
         <View style={styles.divider} />
 
-        <SessionSelector value={timeOfDay} onChange={setTimeOfDay} />
+        {/* select session dropdown */}
+        <SessionSelector
+          session={timeOfDay}
+          onSessionChange={setTimeOfDay}
+          timeType={timeType}
+          onTimeTypeChange={setTimeType}
+        />
+
 
         <View style={styles.divider} />
 

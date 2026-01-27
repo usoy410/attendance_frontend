@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import { BASE_API_URL } from '../constants/api';
+import { BASE_API_URL } from '@/constants/api';
 export interface Event {
   _id: string;
   eventTitle: string;

@@ -1,45 +1,74 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
   borderRadius,
   colors,
   elevation,
   spacing,
-  touchTarget,
-  typography,
-} from "../constants/theme";
+  typography
+} from "@/constants/theme";
+import { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 
 interface SessionSelectorProps {
-  value: "AM" | "PM";
-  onChange: (val: "AM" | "PM") => void;
+  session: "AM" | "PM";
+  onSessionChange: (value: "AM" | "PM") => void;
+  timeType: "Time In" | "Time Out";
+  onTimeTypeChange: (value: "Time In" | "Time Out") => void;
 }
 
-export function SessionSelector({ value, onChange }: SessionSelectorProps) {
+export function SessionSelector({ session, onSessionChange, timeType, onTimeTypeChange }: SessionSelectorProps) {
+  const [sessionOpen, setSessionOpen] = useState(false);
+  const [timeTypeOpen, setTimeTypeOpen] = useState(false);
+  const [localSession, setLocalSession] = useState(session);
+  const [localTimeType, setLocalTimeType] = useState(timeType);
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Select Session</Text>
-      <View style={styles.radioGroup}>
-        {(["AM", "PM"] as const).map((option) => (
-          <TouchableOpacity
-            key={option}
-            style={[
-              styles.radioButton,
-              value === option && styles.radioButtonSelected,
+
+      <View style={{ flexDirection: "row", gap: spacing.lg }}>
+        {/* Session AM or PM */}
+        <View style={styles.dropdownContainer}>
+          <Text style={styles.label}>Session</Text>
+          <DropDownPicker
+            open={sessionOpen}
+            setOpen={setSessionOpen}
+            value={localSession}
+            setValue={setLocalSession}
+            onSelectItem={(item) => item.value && onSessionChange(item.value)}
+            items={[
+              { label: "AM", value: "AM" },
+              { label: "PM", value: "PM" },
             ]}
-            onPress={() => onChange(option)}
-          >
-            <View style={styles.radioOuterCircle}>
-              {value === option && <View style={styles.radioInnerCircle} />}
-            </View>
-            <Text
-              style={[
-                styles.radioText,
-                value === option && styles.radioTextSelected,
-              ]}
-            >
-              {option}
-            </Text>
-          </TouchableOpacity>
-        ))}
+            style={styles.pickerWrapper}
+            textStyle={styles.pickerText}
+            dropDownContainerStyle={styles.dropDownContainerStyle}
+            // scrollViewProps={{ nestedScrollEnabled: true }}
+            listMode="SCROLLVIEW"
+          />
+        </View>
+
+        {/* Time in or time out */}
+        <View style={styles.dropdownContainer}>
+          <Text style={styles.label}>Time type</Text>
+          <DropDownPicker
+            open={timeTypeOpen}
+            setOpen={setTimeTypeOpen}
+            value={localTimeType}
+            setValue={setLocalTimeType}
+            onSelectItem={(item) => item.value && onTimeTypeChange(item.value)}
+            items={[
+              { label: "Time In", value: "Time In" },
+              { label: "Time Out", value: "Time Out" },
+            ]}
+            style={styles.pickerWrapper}
+            textStyle={styles.pickerText}
+            dropDownContainerStyle={styles.dropDownContainerStyle}
+            // scrollViewProps={{ nestedScrollEnabled: true }}
+            listMode="SCROLLVIEW"
+
+          />
+        </View>
       </View>
     </View>
   );
@@ -53,46 +82,33 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     color: colors.textPrimary,
   },
-  radioGroup: { flexDirection: "row", gap: spacing.lg },
-  radioButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.bgPrimary,
-    paddingVertical: spacing.lg - 2,
-    paddingHorizontal: spacing.lg,
-    borderRadius: borderRadius.md,
-    borderWidth: 2,
-    borderColor: colors.borderLight,
+  dropdownContainer: {
+    marginBottom: spacing.lg,
     flex: 1,
-    minHeight: touchTarget.comfortable,
-    justifyContent: "center",
-    ...elevation.level1,
   },
-  radioButtonSelected: {
-    borderColor: colors.primary,
-    backgroundColor: "#f8fbff",
-    ...elevation.level2,
-  },
-  radioOuterCircle: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: colors.borderDark,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: spacing.md - 2,
-  },
-  radioInnerCircle: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
-    backgroundColor: colors.primary,
-  },
-  radioText: {
+  label: {
     ...typography.bodyLg,
     fontWeight: "600",
-    color: colors.textMuted,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
   },
-  radioTextSelected: { color: colors.primary },
+  pickerWrapper: {
+    borderWidth: 2,
+    borderColor: colors.borderLight,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.bgPrimary,
+    paddingHorizontal: spacing.md,
+    ...elevation.level1,
+  },
+  pickerText: {
+    ...typography.bodyLg,
+    color: colors.textPrimary,
+  },
+  dropDownContainerStyle: {
+    borderWidth: 2,
+    borderColor: colors.borderLight,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.bgPrimary,
+    ...elevation.level1,
+  },
 });
