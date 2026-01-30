@@ -65,9 +65,12 @@ export default function EventDetails() {
       return;
     }
 
+    // Determine the correct field based on timeOfDay and timeType
+    const fieldKey = timeType === "Time Out" ? `${timeOfDay}Out` : timeOfDay;
+
     const payload = {
       ...studentData,
-      [timeOfDay]: true,
+      [fieldKey]: true,
     };
 
     const success = await submitAttendance(eventId, payload);
@@ -78,7 +81,7 @@ export default function EventDetails() {
       setStudentData(null);
       Alert.alert("Success", "Attendance recorded successfully");
     }
-  }, [studentData, timeOfDay, eventId, submitAttendance]);
+  }, [studentData, timeOfDay, timeType, eventId, submitAttendance]);
 
   const handleReject = useCallback(() => {
     setModalVisible(false);

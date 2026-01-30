@@ -24,7 +24,16 @@ export const performLogin = async (studentId: string, password: string) => {
 
     clearTimeout(timeoutId);
 
-    const data = await response.json();
+    const text = await response.text();
+    let data: any = {};
+
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Invalid response from server");
+      }
+    }
 
     if (!response.ok) {
       throw new Error(getErrorMessage(response.status, data));
