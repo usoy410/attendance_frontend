@@ -11,7 +11,8 @@ export interface AttendancePayload {
   gbox: string;
   AM?: boolean;
   PM?: boolean;
-  
+  AMOut?: boolean;
+  PMOut?: boolean;
 }
 
 const API_URL = `${BASE_API_URL}/attendance`;
