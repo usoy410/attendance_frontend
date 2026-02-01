@@ -1,14 +1,37 @@
 import { gradients } from "@/constants/theme";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Image, StyleSheet } from "react-native";
 
 const SplashScreen = () => {
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = await AsyncStorage.getItem("userToken");
+        if (token) {
+          // User is logged in, navigate to events
+          router.replace("/event/events");
+        } else {
+          // No token, navigate to login
+          router.replace("/auth/login");
+        }
+      } catch (error) {
+        console.error("Error checking auth:", error);
+        // On error, default to login screen
+        router.replace("/auth/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Show splash for at least 1.5 seconds for better UX
     const timer = setTimeout(() => {
-      router.replace("/auth/login");
-    }, 2000); // Navigate to login after 2 seconds
+      checkAuth();
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);

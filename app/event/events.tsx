@@ -3,6 +3,8 @@ import { EventFormModal, FormState } from "@/components/EventFormModal";
 import { PaginationControls } from "@/components/PaginationControls";
 import { Event, useEvents } from "@/hooks/useEvents";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -32,6 +34,29 @@ export default function EventsScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem("userToken");
+              router.replace("/auth/login");
+            } catch (error) {
+              console.error("Error logging out:", error);
+              Alert.alert("Error", "Failed to logout. Please try again.");
+            }
+          },
+        },
+      ]
+    );
+  };
 
   // Helpers
   const validateForm = (): boolean => {
@@ -110,7 +135,12 @@ export default function EventsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Text style={styles.title}>Events</Text>
+        <View style={styles.header}>
+          <Text style={styles.title}>Events</Text>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={24} color="#007bff" />
+          </TouchableOpacity>
+        </View>
 
         {loading && !refreshing ? (
           <View style={styles.center}>
@@ -159,11 +189,19 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md - 2,
   },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: {
-    textAlign: "center",
-    ...typography.h1,
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: spacing.lg,
     marginBottom: spacing.md - 2,
+  },
+  title: {
+    ...typography.h1,
     color: colors.textPrimary,
+  },
+  logoutButton: {
+    padding: spacing.sm,
   },
   listContainer: { flexGrow: 1, padding: spacing.lg, paddingBottom: 100 },
   noEvents: {
