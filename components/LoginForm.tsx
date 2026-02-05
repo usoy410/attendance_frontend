@@ -1,5 +1,7 @@
 import { borderRadius, colors, spacing, touchTarget, typography } from "@/constants/theme";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, StyleSheet, Text, TextInput, View, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 
 interface LoginFormProps {
   studentId: string;
@@ -17,46 +19,62 @@ const LoginForm = ({
   onStudentIdChange,
   onPasswordChange,
   onSubmit,
-}: LoginFormProps) => (
-  <View style={styles.loginContainer}>
-    <View style={styles.inner}>
-      <Text style={styles.title}>Student Portal</Text>
+}: LoginFormProps) => {
+  const [showPassword, setShowPassword] = useState(false);
 
-      <Text style={styles.label}>Student ID</Text>
-      <TextInput
-        style={styles.input}
-        value={studentId}
-        onChangeText={onStudentIdChange}
-        placeholder="Enter ID"
-        keyboardType="numeric"
-        autoCapitalize="none"
-        autoCorrect={false}
-        placeholderTextColor={colors.textSecondary}
-        editable={!loading}
-      />
+  return (
+    <View style={styles.loginContainer}>
+      <View style={styles.inner}>
+        <Text style={styles.title}>Student Portal</Text>
 
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={onPasswordChange}
-        secureTextEntry
-        placeholder="Enter Password"
-        autoCapitalize="none"
-        placeholderTextColor={colors.textSecondary}
-        editable={!loading}
-      />
-
-      <View style={styles.buttonContainer}>
-        <Button
-          title={loading ? "Verifying..." : "Login"}
-          onPress={onSubmit}
-          disabled={loading}
+        <Text style={styles.label}>Student ID</Text>
+        <TextInput
+          style={styles.input}
+          value={studentId}
+          onChangeText={onStudentIdChange}
+          placeholder="Enter ID"
+          keyboardType="numeric"
+          autoCapitalize="none"
+          autoCorrect={false}
+          placeholderTextColor={colors.textSecondary}
+          editable={!loading}
         />
+        <Text style={styles.label}>Password</Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            value={password}
+            onChangeText={onPasswordChange}
+            secureTextEntry={!showPassword}
+            placeholder="Enter Password"
+            autoCapitalize="none"
+            placeholderTextColor={colors.textSecondary}
+            editable={!loading}
+          />
+          <TouchableOpacity
+            style={styles.visibilityButton}
+            onPress={() => setShowPassword(!showPassword)}
+            disabled={loading}
+          >
+            <Ionicons
+              name={showPassword ? "eye-off" : "eye"}
+              size={20}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <Button
+            title={loading ? "Verifying..." : "Login"}
+            onPress={onSubmit}
+            disabled={loading}
+          />
+        </View>
       </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   loginContainer: {
@@ -89,6 +107,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255, 0.5)',
     ...typography.bodyLg,
     minHeight: touchTarget.comfortable,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.borderMedium,
+    borderRadius: borderRadius.sm,
+    backgroundColor: 'rgba(255,255,255, 0.5)',
+    marginBottom: spacing.xl,
+    minHeight: touchTarget.comfortable,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: spacing.md + 2,
+    paddingHorizontal: spacing.lg,
+    ...typography.bodyLg,
+  },
+  visibilityButton: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md + 2,
   },
   buttonContainer: { marginTop: spacing.md - 2 },
 });
